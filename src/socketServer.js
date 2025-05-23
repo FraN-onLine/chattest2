@@ -5,7 +5,7 @@ import mysql from 'mysql2/promise';
 const db = await mysql.createConnection({
   host: 'localhost',
   user: 'root', // Replace 
-  password: 'root', // Replace 
+  password: '', // Replace 
   database: 'ccisconnectusers',
 });
 

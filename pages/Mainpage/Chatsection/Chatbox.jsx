@@ -5,15 +5,13 @@ import { IoMdSend } from "react-icons/io";
 
 const DEFAULT_ROOM = "Dev Circle";
 
-function Chatbox({ username }) {
+function Chatbox({ username, room, setRoom }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
-  const [room, setRoom] = useState(DEFAULT_ROOM);
   const [newRoom, setNewRoom] = useState('');
   const [roomList, setRoomList] = useState([DEFAULT_ROOM]);
 
-  // Connect socket on mount
   useEffect(() => {
     const newSocket = io('http://localhost:3000');
     setSocket(newSocket);
@@ -22,12 +20,10 @@ function Chatbox({ username }) {
     };
   }, []);
 
-  // Fetch room list
   useEffect(() => {
     if (!socket) return;
     socket.emit('get_rooms');
     socket.on('room_list', (rooms) => {
-      // Always include the default room
       setRoomList(rooms.includes(DEFAULT_ROOM) ? rooms : [DEFAULT_ROOM, ...rooms]);
     });
     return () => {
@@ -35,7 +31,6 @@ function Chatbox({ username }) {
     };
   }, [socket]);
 
-  // Join room and set up listeners
   useEffect(() => {
     if (!socket) return;
     socket.emit('join_room', room);
@@ -67,49 +62,14 @@ function Chatbox({ username }) {
 
   const handleCreateRoom = () => {
     if (newRoom.trim() !== '' && socket) {
-    setRoom(newRoom.trim());
-    socket.emit('join_room', newRoom.trim());
-    setNewRoom('');
-  }
+      setRoom(newRoom.trim());
+      socket.emit('join_room', newRoom.trim());
+      setNewRoom('');
+    }
   };
 
   return (
-    <div className="Chatbox-main-layout" style={{ display: 'flex', height: '100%' }}>
-      {/* Sidebar for rooms */}
-      <div className="Chatbox-room-sidebar" style={{ width: 180, borderRight: '1px solid #eee', background: '#fafbfc', padding: '1em 0' }}>
-        <div style={{ padding: '0 1em', marginBottom: '1em' }}>
-          <input
-            type="text"
-            value={newRoom}
-            onChange={(e) => setNewRoom(e.target.value)}
-            placeholder="New room name"
-            style={{ width: '100%', borderRadius: '8px', padding: '0.3em' }}
-          />
-          <button style={{ width: '100%', marginTop: 6 }} onClick={handleCreateRoom}>Create/Join</button>
-        </div>
-        <div>
-          <b style={{ marginLeft: '1em' }}>Rooms</b>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {roomList.map((r) => (
-            <li
-              key={r}
-              style={{
-                padding: '0.5em 1em',
-                background: r === room ? '#e6f7ff' : 'transparent',
-                cursor: 'pointer',
-                fontWeight: r === room ? 'bold' : 'normal'
-              }}
-              onClick={() => {
-                setRoom(r);
-                if (socket) socket.emit('join_room', r);
-              }}
-            >
-              {r}
-            </li>
-          ))}
-        </ul>
-        </div>
-      </div>
+    <div className="Chatbox-main-layout" style={{ display: 'flex', height: '100%', boxSizing:'border-box',padding:'1em',backgroundColor:'white'}}>
       {/* Main chat area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div className="Chatbox-header">

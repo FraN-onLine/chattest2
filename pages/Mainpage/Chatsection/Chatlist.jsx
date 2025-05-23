@@ -4,49 +4,49 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import Recentchatcontainer from "../../Component/Recentchatcontainer";
 import { io } from 'socket.io-client';
 import '../../../src/Css/Mainpage/Chatsection/Chatlist.css';
+import { FaEdit } from "react-icons/fa";
 
-function Chatlist({ username, setUsername }) {
+
+function Chatlist({ username, setUsername, room, setRoom }) {
   const [Dropdown, setDropdown] = useState(true);
   const [editing, setEditing] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [socket, setSocket] = useState(null);
   const [error, setError] = useState('');
-const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [newRoom, setNewRoom] = useState('');
 
-useEffect(() => {
-  async function fetchUsername() {
-    try {
-      const res = await fetch('http://localhost/CCIS_CONNECT-MASTER/src/php/get_username.php', { credentials: 'include' });
-      const data = await res.json();
-      if (data.username) {
-        setUsername(data.username);
-        setNewUsername(data.username);
-        setUserId(data.userId);
-      } else {
+  useEffect(() => {
+    async function fetchUsername() {
+      try {
+        const res = await fetch('http://localhost/CCIS_CONNECT-MASTER/src/php/get_username.php', { credentials: 'include' });
+        const data = await res.json();
+        if (data.username) {
+          setUsername(data.username);
+          setNewUsername(data.username);
+          setUserId(data.userId);
+        } else {
+          setUsername('Unknown');
+          setNewUsername('Unknown');
+        }
+      } catch (e) {
         setUsername('Unknown');
         setNewUsername('Unknown');
       }
-    } catch (e) {
-      setUsername('Unknown');
-      setNewUsername('Unknown');
     }
-  }
-  fetchUsername();
-}, []);
+    fetchUsername();
+  }, []);
 
-  // Keep newUsername in sync if username changes externally
   useEffect(() => {
     setNewUsername(username);
   }, [username]);
 
-  // Socket setup
   useEffect(() => {
     const newSocket = io('http://localhost:3000');
     setSocket(newSocket);
     return () => newSocket.disconnect();
   }, []);
 
-  // Listen for username change result
   useEffect(() => {
     if (!socket) return;
     const handler = (result) => {
@@ -62,7 +62,6 @@ useEffect(() => {
     return () => socket.off('username_changed', handler);
   }, [socket, setUsername]);
 
-  // Handlers
   const handleUsernameChange = (e) => setNewUsername(e.target.value);
 
   const submitUsernameChange = (e) => {
@@ -80,6 +79,15 @@ useEffect(() => {
     setDropdown(!Dropdown);
   }
 
+  // FIX: Add this function to handle room creation/join
+  const handleCreateRoom = () => {
+    if (newRoom.trim() !== '' && socket) {
+      setRoom(newRoom.trim());
+      socket.emit('join_room', newRoom.trim());
+      setNewRoom('');
+    }
+  };
+
   return (
     <div className="Chatlist-container">
       <div className="Chatlist-header">
@@ -90,7 +98,7 @@ useEffect(() => {
       <div className="Chatlist-profile-section">
         <div className="profile-placeholder">
           <img
-            src="https://c4.wallpaperflare.com/wallpaper/399/722/332/one-punch-man-saitama-hd-wallpaper-preview.jpg"
+            src="https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg"
             alt="profile.jpg"
             className='profile-image'
           />
@@ -129,7 +137,7 @@ useEffect(() => {
                   type="button"
                   onClick={() => { setEditing(true); setError(''); }}
                   title="Edit Username"
-                >✎</button>
+                ><FaEdit/></button>
               </>
             )}
           </form>
@@ -144,9 +152,19 @@ useEffect(() => {
         <span>Recent Chats</span>
         <IoMdArrowDropdown size={22} style={{ transform: Dropdown ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }} />
       </div>
+      <div style={{ padding: '0 1em', marginBottom: '1em' }}>
+        <input
+          type="text"
+          value={newRoom}
+          onChange={(e) => setNewRoom(e.target.value)}
+          placeholder="New room name"
+          style={{ width: '100%', borderRadius: '8px', padding: '0.3em' }}
+        />
+        <button className='recent-chat-create' onClick={handleCreateRoom}>Create/Join</button>
+      </div>
       {Dropdown && (
         <div className="Chatlist-recent-section">
-          <Recentchatcontainer />
+          <Recentchatcontainer onRoomSelect={setRoom} currentRoom={room} />
         </div>
       )}
     </div>

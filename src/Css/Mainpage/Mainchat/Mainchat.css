@@ -3,9 +3,19 @@
     padding: 0;
 }
 .Main-content{
-    display: grid;
-    grid-template-columns: 0.5fr 2fr 3fr 1fr;
+    display: flex;
+    flex-direction: row;
     width: 100vw;
     height: 100vh;
     background-color: #ffffff;
+}
+.feature-contents{
+    display: flex;
+    width: 100%;
+    height: 95%;
+    box-sizing: border-box;
+    padding: 1em;
+    background-color: #f7f7f7;
+    border-radius: 15px;
+    margin: 1em 2em 1em 1em;
 }
