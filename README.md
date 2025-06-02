@@ -84,3 +84,27 @@ at package.json add the start:all line
 
 npm run start:all
 
+## OVERVIEW
+
+# Landing Page
+Functionalities
+- Login
+- Signup
+- Contact (Pending)
+![image](https://github.com/user-attachments/assets/897ad36e-3829-422d-89f6-abddd4527f1c)
+![image](https://github.com/user-attachments/assets/7e935552-4370-4378-82e5-880911df240a)
+
+# Main Page
+Functionalities
+- Change Username  
+- Create/Join Rooms  
+- Chat System
+  
+![image](https://github.com/user-attachments/assets/649c372b-3faf-420a-bae5-787a57e06936)
+
+
+# Upload Page
+Functionalities
+- Upload
+- Delete
+![image](https://github.com/user-attachments/assets/50627af5-0b90-4b53-848e-536990f0c128)
