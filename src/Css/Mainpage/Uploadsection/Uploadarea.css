@@ -163,6 +163,14 @@ h1{
     color: red;
 }
 
+.delete-button{
+    cursor: pointer;
+    transition: color 0.2s ease-in;
+    color: #d31313;
+    border: none;
+}
+   
+
 .Document-upload-box{
     background-color: #ffffff;
     display: flex;
@@ -274,3 +282,4 @@ h1{
     }
     
 }
+

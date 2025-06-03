@@ -4,11 +4,13 @@ import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
 import mysql from 'mysql2/promise';
+import bodyParser from 'body-parser';
 
 const app = express();
 const port = 3090;
 
 app.use(cors());
+app.use(bodyParser.json());
 
 const db = await mysql.createPool({
   host: 'localhost',
@@ -80,6 +82,26 @@ app.get('/list-uploads', async (req, res) => {
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: 'Failed to list files' });
+  }
+});
+
+// Delete file endpoint
+app.delete('/uploads/:id', async (req, res) => {
+  const fileId = req.params.id;
+  try {
+    // Get filename from DB
+    const [[file]] = await db.query('SELECT filename FROM uploaded_files WHERE id = ?', [fileId]);
+    if (!file) return res.status(404).json({ error: 'File not found' });
+
+    // Delete file from disk
+    const filePath = path.join(uploadDir, file.filename);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+    // Delete from DB
+    await db.query('DELETE FROM uploaded_files WHERE id = ?', [fileId]);
+    res.json({ message: 'File deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete file: ' + err.message });
   }
 });
 

@@ -108,6 +108,23 @@ const handleUpload = async (e) => {
   setUploading(false);
 };
 
+const handleDelete = async (fileId) => {
+  if (!window.confirm('Are you sure you want to delete this file?')) return;
+  try {
+    const res = await fetch(`http://localhost:3090/uploads/${fileId}`, {
+      method: 'DELETE',
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setUploadedFiles(files => files.filter(f => f.id !== fileId));
+    } else {
+      alert(data.error || 'Failed to delete file.');
+    }
+  } catch (err) {
+    alert('Failed to delete file: ' + err.message);
+  }
+};
+
   return(
     <>
        <div className="Uploadarea-content">
@@ -132,13 +149,11 @@ const handleUpload = async (e) => {
   padding: '10px'
 }}>
   {uploadedFiles.map(file => (
-  <div className='uploaded-file-container' key={file.id} style={{
-  
-  }}>
-    <div title={file.title} style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+  <div className='uploaded-file-container' key={file.id} style={{ }}>
+    <div title={file.title} style={{ fontWeight: 'bold', marginBottom: '4px', textAlign: "center", color: '#333' }}>
       {file.title}
     </div>
-    <div style={{ fontSize: '0.9em', color: '#555', marginBottom: '4px' }}>
+    <div style={{ fontSize: '0.9em', color: '#555', marginBottom: '4px', textAlign: "center" }}>
       Uploaded by: <b>{file.username}</b>
     </div>
     <a
@@ -153,12 +168,19 @@ const handleUpload = async (e) => {
     >
       Download
     </a>
+    <button
+      class="delete-button"
+      onClick={() => handleDelete(file.id)}
+      title="Delete file"
+    >
+      Delete
+    </button>
   </div>
 ))}
 </div>
-            </div>
-          </div>
+    </div>
        </div>
+          </div>
        {uploadModal && 
          <dialog className='uploadModal' open>
            <div className="uploadModal-box">
